@@ -1,4 +1,12 @@
+<<<<<<< Updated upstream
 ﻿using BepInEx;
+=======
+﻿using System.Reflection;
+using BepInEx;
+using Nautilus.Handlers;
+using Nautilus.Json;
+using Nautilus.Options.Attributes;
+>>>>>>> Stashed changes
 
 namespace ImpulseSpeedBooster
 {
@@ -8,6 +16,7 @@ namespace ImpulseSpeedBooster
     [BepInDependency(VehicleFramework.PluginInfo.PLUGIN_GUID, VehicleFramework.PluginInfo.PLUGIN_VERSION)]
     public class MainPatcher : BaseUnityPlugin
     {
+        internal static ImpulseSpeedConfig ImpulseConfig { get; private set; }
         public static MainPatcher Instance { get; private set; }
         public static float invincibilityDuration = 3f;
         public static float maxCharge = 30f;
@@ -27,8 +36,35 @@ namespace ImpulseSpeedBooster
         }
         public void Start()
         {
+<<<<<<< Updated upstream
             VehicleFramework.Admin.UpgradeRegistrar.RegisterUpgrade(new ImpulseSpeedBooster());
+=======
+            LanguageHandler.RegisterLocalizationFolder();
+            ImpulseSpeedBooster module = new ImpulseSpeedBooster();
+            VehicleFramework.Admin.UpgradeRegistrar.RegisterUpgrade(module);
+>>>>>>> Stashed changes
             SpeedConfig.RegisterOptions();
+            ImpulseConfig = OptionsPanelHandler.RegisterModOptions<ImpulseSpeedConfig>();
+            if (ImpulseConfig.vanillaFabricator)
+            {
+                CraftTreeHandler.AddCraftingNode(
+                    CraftTree.Type.SeamothUpgrades,
+                    module.TechTypes.forSeamoth,
+                    new string[] { "SeamothModules" }
+                );
+                CraftTreeHandler.AddCraftingNode(
+                    CraftTree.Type.SeamothUpgrades,
+                    module.TechTypes.forExosuit,
+                    new string[] { "ExosuitModules" }
+                );
+            }
         }
+    }
+
+    [Menu("Impulse Speed Module Options")]
+    public class ImpulseSpeedConfig : ConfigFile
+    {
+        [Toggle("Can be crafted in vanilla fabricator", Tooltip = "Allow the module to be crafted in the vehicle upgrades console. Restart required.")]
+        public bool vanillaFabricator = false;
     }
 }

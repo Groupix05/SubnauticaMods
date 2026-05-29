@@ -1,5 +1,14 @@
+<<<<<<< Updated upstream
 ﻿using BepInEx;
 using System.Collections;
+=======
+﻿using System.Collections;
+using BepInEx;
+using HarmonyLib;
+using Nautilus.Handlers;
+using Nautilus.Json;
+using Nautilus.Options.Attributes;
+>>>>>>> Stashed changes
 using UnityEngine;
 using HarmonyLib;
 using VehicleFramework.Admin;
@@ -12,8 +21,14 @@ namespace VFScannerArm
     {
         public static GameObject originalScannerToolPrefab = null;
         public static ScannerTool originalScannerTool = null;
+        internal static ScannerArmConfig ScannerConfig { get; private set; }
         public void Start()
         {
+<<<<<<< Updated upstream
+=======
+            LanguageHandler.RegisterLocalizationFolder();
+            ScannerConfig = OptionsPanelHandler.RegisterModOptions<ScannerArmConfig>();
+>>>>>>> Stashed changes
             UWE.CoroutineHost.StartCoroutine(DoRegistrations());
             var harmony = new Harmony("com.mikjaw.subnautica.vfscannerarm.mod");
             harmony.PatchAll();
@@ -27,6 +42,14 @@ namespace VFScannerArm
             yield return UWE.CoroutineHost.StartCoroutine(vfscannerarm.GetArmPrefab(armRequest));
             GameObject armPrefab = armRequest.Get();
             FragmentUtils.RegisterScannerArmFragment(scannerArmTT.forModVehicle, armPrefab);
+            if (ScannerConfig.vanillaFabricator)
+            {
+                CraftTreeHandler.AddCraftingNode(
+                    CraftTree.Type.SeamothUpgrades,
+                    vfscannerarm.TechTypes.forExosuit,
+                    new string[] { "ExosuitModules" }
+                );
+            }
         }
         public IEnumerator GetOriginalScannerTool()
         {
@@ -35,5 +58,12 @@ namespace VFScannerArm
             originalScannerToolPrefab = result.Get();
             originalScannerTool = originalScannerToolPrefab.GetComponent<ScannerTool>();
         }
+    }
+
+    [Menu("Scanner Arm Options")]
+    public class ScannerArmConfig : ConfigFile
+    {
+        [Toggle("Can be crafted in vanilla fabricator", Tooltip = "Allow the module to be crafted in the vehicle upgrades console. Restart required.")]
+        public bool vanillaFabricator = false;
     }
 }
